@@ -3,32 +3,43 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;                // để dùng Application.Current.Dispatcher
 
 namespace PixelBridge
 {
     public class TCPClient
     {
         private const int BUFFER_SIZE = 1024;
+
         public string IPAddress { get; set; }
         public int Port { get; set; }
+
         private TcpClient? tcpClient;
+
         private bool _isMonitoring = false;
         private bool _lastState = false;
         private bool _isReconnecting = false;
+
         public event Action<bool>? ConnectionStateChanged;
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
+
         public TCPClient(string ip, int port)
         {
             IPAddress = ip;
             Port = port;
         }
         /// <summary>
+        /// Fire event lên UI thread nhưng dùng BeginInvoke (non-blocking)
+        /// </summary>
+        /// <param name="state"></param>
+        private void RaiseConnectionState(bool state)
+        {
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                ConnectionStateChanged?.Invoke(state);
+            }));
+        }
+        /// <summary>
         /// Kết nối 1 lần
-        /// not in used
         /// </summary>
         /// <returns></returns>
         public bool Connect()
@@ -37,27 +48,29 @@ namespace PixelBridge
             {
                 tcpClient = new TcpClient();
                 tcpClient.Connect(IPAddress, Port);
-
-                ConnectionStateChanged?.Invoke(true);
+                RaiseConnectionState(true);
                 return true;
             }
             catch
             {
-                ConnectionStateChanged?.Invoke(false);
+                RaiseConnectionState(false);
                 return false;
             }
         }
         /// <summary>
-        /// Ngắt kết nôi
+        /// Ngắt kết nối
         /// </summary>
         public void Disconnect()
         {
-            try
-            {
-                tcpClient?.Close();
-            }
+            try { tcpClient?.Close(); }
             catch { }
         }
+        /// <summary>
+        /// Kiểm tra kết nối socket
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="timeoutMs"></param>
+        /// <returns></returns>
         private async Task<bool> IsSocketConnectedAsync(Socket socket, int timeoutMs = 300)
         {
             try
@@ -65,23 +78,19 @@ namespace PixelBridge
                 if (socket == null || !socket.Connected)
                     return false;
 
-                // Kiểm tra remote-closed (FIN)
+                // remote closed
                 if (socket.Poll(0, SelectMode.SelectRead) && socket.Available == 0)
                     return false;
 
-                // Gửi 0 byte để test
+                // gửi 0 byte
                 var empty = Array.Empty<byte>();
                 var sendTask = socket.SendAsync(empty, SocketFlags.None);
 
-                // Timeout
                 var completed = await Task.WhenAny(sendTask, Task.Delay(timeoutMs));
-
                 if (completed != sendTask)
-                    return false;   // timeout => mất kết nối
+                    return false;
 
-                // Nếu SendAsync ném lỗi → mất kết nối
                 await sendTask;
-
                 return true;
             }
             catch
@@ -90,7 +99,7 @@ namespace PixelBridge
             }
         }
         /// <summary>
-        /// AUTO-RECONNECT LOOP
+        /// Bắt đầu giám sát kết nối
         /// </summary>
         /// <param name="intervalMs"></param>
         public void StartMonitorConnection(int intervalMs = 1000)
@@ -109,14 +118,12 @@ namespace PixelBridge
                         isAlive = await IsSocketConnectedAsync(tcpClient.Client);
                     }
 
-                    // Phát event khi thay đổi trạng thái
                     if (isAlive != _lastState)
                     {
                         _lastState = isAlive;
-                        ConnectionStateChanged?.Invoke(isAlive);
+                        RaiseConnectionState(isAlive);
                     }
 
-                    // Nếu socket chết → cố gắng reconnect
                     if (!isAlive)
                     {
                         await Task.Delay(2000);
@@ -128,36 +135,34 @@ namespace PixelBridge
             });
         }
         /// <summary>
-        /// Kết thúc loop
+        /// Kết thúc việc giám sát kết nối
         /// </summary>
         public void StopMonitorConnection()
         {
             _isMonitoring = false;
         }
         /// <summary>
-        /// Try reconnect nếu đứt kết nối
+        /// Reconnect đến TCP server
         /// </summary>
         /// <returns></returns>
         private async Task TryReconnect()
         {
-            if (_isReconnecting) return;   // tránh chạy nhiều lần
+            if (_isReconnecting) return;
             _isReconnecting = true;
 
             try
             {
                 Disconnect();
-
                 tcpClient = new TcpClient();
+
                 await tcpClient.ConnectAsync(IPAddress, Port);
 
-                // TCPClient.ConnectAsync KHÔNG đảm bảo socket còn sống 100%
-                // nhưng tạm coi là thành công
                 _lastState = true;
-                ConnectionStateChanged?.Invoke(true);
+                RaiseConnectionState(true);
             }
             catch
             {
-                // thất bại => để vòng monitor thử lại
+                // thất bại, để vòng loop thử lại
                 await Task.Delay(1000);
             }
             finally
@@ -165,53 +170,64 @@ namespace PixelBridge
                 _isReconnecting = false;
             }
         }
+        /// <summary>
+        /// Gửi data đến TCP server
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public bool SendData(string msg)
         {
             if (_lastState)
             {
                 try
                 {
-                    ASCIIEncoding encoding = new ASCIIEncoding();
                     Stream stream = tcpClient.GetStream();
-                    byte[] dataSend = encoding.GetBytes(msg);
+                    byte[] dataSend = Encoding.ASCII.GetBytes(msg);
                     stream.Write(dataSend, 0, dataSend.Length);
                     return true;
                 }
-                catch (Exception ex)
+                catch
                 {
                     return false;
                 }
             }
             return false;
         }
+        /// <summary>
+        /// Đọc data từ TCP server
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="timeoutMs"></param>
+        /// <returns></returns>
         public bool ReadData(out string data, int timeoutMs = 100)
         {
             data = string.Empty;
+
+            if (tcpClient == null) return false;
+
             var stream = tcpClient.GetStream();
-            stream.ReadTimeout = timeoutMs;             // QUAN TRỌNG: tránh block vô hạn
+            stream.ReadTimeout = timeoutMs;
 
             var buf = new byte[BUFFER_SIZE];
+
             try
             {
-                // Check mất kết nối REAL-TIME
                 if (!_lastState)
                 {
                     tcpClient.Close();
                     return false;
                 }
 
-                // Có thể check nhanh trước:
                 if (!stream.DataAvailable) return false;
 
-                int n = stream.Read(buf, 0, buf.Length); // block tối đa = timeoutMs
+                int n = stream.Read(buf, 0, buf.Length);
                 if (n == 0) throw new IOException("Remote closed");
+
                 data = Encoding.ASCII.GetString(buf, 0, n);
                 return true;
             }
-            catch (IOException ex) when (ex.InnerException is SocketException se
-                                         && se.SocketErrorCode == SocketError.TimedOut)
+            catch
             {
-                // Hết thời gian chờ => coi như “chưa có data”, cho vòng lặp kiểm tra Cancel/Stop
                 return false;
             }
         }

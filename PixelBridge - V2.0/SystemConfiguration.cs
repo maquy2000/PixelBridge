@@ -37,7 +37,7 @@ namespace PixelBridge
         /// Chế đọ kiểm tra chuỗi con trong dữ liệu đầu vào
         /// </summary>
         public bool IsInputDataContain { get; set; } = false;
-        public string InputDataContainString { get; set; } = "AA";
+        public string InputDataContainString { get; set; } = "A2";
 
 
     }

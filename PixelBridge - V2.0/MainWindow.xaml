@@ -20,7 +20,7 @@
     <!--<Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding EnterMainWindowCommand}"/>
     </Window.InputBindings>-->
-    <Border BorderBrush="Black" BorderThickness="1">
+    <Border BorderBrush="Gray" BorderThickness="1">
         <Grid Background="#ECF2F2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -38,18 +38,18 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <Image Source="Resource/PixelBridge.ico"/>
                     <TextBlock 
-                        Text="Pixel Bridge - V2.0" 
-                        Margin="5,0,0,0" VerticalAlignment="Center" 
-                        FontSize="18" FontWeight="Bold" Foreground="#0099CC" />
+                            Text="Pixel Bridge - V2.0" 
+                            Margin="5,0,0,0" VerticalAlignment="Center" 
+                            FontSize="18" FontWeight="Bold" Foreground="#0099CC" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Height="40"
-                        FontSize="22" Padding="0,-4,0,0" BorderBrush="White" FontWeight="Thin" Content="⚙️"
-                        Margin="0" Command="{Binding SettingCommand}">
+                            FontSize="22" Padding="0,-4,0,0" BorderBrush="White" FontWeight="Thin" Content="⚙️"
+                            Margin="0" Command="{Binding SettingCommand}">
                     </Button>
                     <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Height="40"
-                        FontSize="28" Padding="0,-4,0,0" BorderBrush="White" FontWeight="Thin" Content="✕"
-                        Margin="0" Command="{Binding ExitCommand}">
+                            FontSize="28" Padding="0,-4,0,0" BorderBrush="White" FontWeight="Thin" Content="✕"
+                            Margin="0" Command="{Binding ExitCommand}">
                     </Button>
                 </StackPanel>
             </Grid>
@@ -64,20 +64,20 @@
                 </Grid>
                 <Grid Grid.Column="1" Margin="5,5,5,5">
                     <TextBox Text="{Binding DataToSendInTextBox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                        Padding="0,0,0,0" Height="40" FontSize="20" 
-                        VerticalAlignment="Center" x:Name="tbxBarcode">
+                            Padding="0,0,0,0" Height="40" FontSize="20" 
+                            VerticalAlignment="Center" x:Name="tbxBarcode">
                         <!--<TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding EnterTextBoxCommand}"/>
-                        </TextBox.InputBindings>-->
+                                <KeyBinding Key="Enter" Command="{Binding EnterTextBoxCommand}"/>
+                            </TextBox.InputBindings>-->
                     </TextBox>
                 </Grid>
             </Grid>
 
             <Grid Grid.Row="2" >
                 <TextBlock
-               Text="{Binding StringError}" x:Name="tbxShowErr" HorizontalAlignment="Center"
-               FontSize="16" Foreground="Red"
-               VerticalAlignment="Center"/>
+                   Text="{Binding StringError}" x:Name="tbxShowErr" HorizontalAlignment="Center"
+                   FontSize="16" Foreground="Red"
+                   VerticalAlignment="Center"/>
             </Grid>
 
             <Grid Grid.Row="3" >
@@ -89,15 +89,15 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!--<theme:PackIcon x:Name="iconConnectProgram" Kind="Information" VerticalAlignment="Center" Foreground="Gray" Width="25" Height="25" />-->
                         <TextBlock
-                            Margin="10,0,0,0" x:Name="iconConnectProgram" 
-                            Width="25" FontSize="18" Text="{Binding ConnectionIcon}" Foreground="{Binding ConnectionColor}"/>
+                                Margin="10,0,0,0" x:Name="iconConnectProgram" 
+                                Width="25" FontSize="18" Text="{Binding ConnectionIcon}" Foreground="{Binding ConnectionColor}"/>
                         <TextBlock 
-                            Padding="0,4,0,0" Margin="5,0,0,0" Text="Connect to the sofware" />
+                                Padding="0,4,0,0" Margin="5,0,0,0" Text="Connect to the sofware" />
                     </StackPanel>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Button Height="30" Width="120" Margin="0,0,30,0" Content="RESET"
-                    VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding ResetCommand}"/>
+                        VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding ResetCommand}"/>
                 </Grid>
 
             </Grid>

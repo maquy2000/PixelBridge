@@ -19,7 +19,6 @@ namespace PixelBridge
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool isDragging = false;
         #region Kiểm soát kích thước window
         private static IntPtr WindowProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
         {
@@ -227,6 +226,7 @@ namespace PixelBridge
             tb?.Focus();
         }
         #endregion
+
         /// <summary>
         /// 
         /// </summary>
@@ -250,15 +250,11 @@ namespace PixelBridge
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                isDragging = true; // Bắt đầu kéo khi click panelHeader
-                try
+                Dispatcher.BeginInvoke(new Action(() =>
                 {
-                    DragMove();
-                }
-                finally
-                {
-                    isDragging = false; // Kết thúc kéo
-                }
+                    try { DragMove(); }
+                    catch { }
+                }));
             }
         }
     }
