@@ -25,9 +25,15 @@ namespace PixelBridge
         /// </summary>
         public string FixedString { get; set; } = "CHECK";
         /// <summary>
-        /// Chuỗi reset
+        /// Dùng nút RESET, để gửi chuỗi RESET
         /// </summary>
+        public bool IsUseResetButton { get; set; } = false;
         public string ResetString { get; set; } = "RESET";
+        /// <summary>
+        /// Dùng nút SPACE, để gửi chuỗi SPACE
+        /// </summary>
+        public bool IsUseSpaceButton { get; set; } = false;
+        public string SpaceString { get; set; } = "CHECK";
         /// <summary>
         /// Chế độ compare độ dài dữ liệu đầu vào
         /// </summary>

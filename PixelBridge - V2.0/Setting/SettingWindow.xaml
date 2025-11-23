@@ -13,6 +13,8 @@
         <ResourceDictionary>
             <local:BooleanToEnable_SendDataInTextBox_Converter x:Key="BooleanToEnable_SendDataInTextBox_Converter" />
             <local:BooleanToEnable_FixedData_Converter x:Key="BooleanToEnable_FixedData_Converter"/>
+            <local:BooleanToVisibility_Button_Converter x:Key="BooleanToVisibility_Button_Converter"/>
+            <local:BooleanToEnable_Button_Converter x:Key="BooleanToEnable_Button_Converter"/>
         </ResourceDictionary>
     </Window.Resources>
     <Border BorderBrush="Black" BorderThickness="0">
@@ -49,13 +51,28 @@
                         </Grid.ColumnDefinitions>
                         <!--<TextBlock Text="End of all data send" Grid.Column="0" VerticalAlignment="Center" FontSize="14"/>-->
                     </Grid>
+                    <!--Dùng phím Space để gửi dữ liệu ngay lập tức-->
                     <Grid Margin="0,0,0,4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="150"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Click RESET to send" Grid.Column="0" VerticalAlignment="Center" FontSize="14"/>
+                        <CheckBox Content="Use SPACE to send" IsChecked="{Binding Config.IsUseSpaceButton, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                            Grid.Column="0" VerticalAlignment="Center" FontSize="14"/>
+                        <TextBox Grid.Column="1" Height="24" FontSize="14" 
+                                 IsEnabled="{Binding Config.IsUseSpaceButton, Converter={StaticResource BooleanToEnable_Button_Converter}}"
+                                 Text="{Binding Config.SpaceString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                    <!--Dùng phím reset để gửi dữ liệu ngay lập tức-->
+                    <Grid Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="Click RESET to send" IsChecked="{Binding Config.IsUseResetButton, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                  Grid.Column="0" VerticalAlignment="Center" FontSize="14"/>
                         <TextBox Grid.Column="1" Height="24" FontSize="14"
+                                 IsEnabled="{Binding Config.IsUseResetButton, Converter={StaticResource BooleanToEnable_Button_Converter}}"
                                  Text="{Binding Config.ResetString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                     </Grid>
                     <Grid Margin="0,0,0,4">

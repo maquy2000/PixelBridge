@@ -12,15 +12,17 @@
         <ResourceDictionary>
             <local:BooleanToEnable_SendDataInTextBox_Converter x:Key="BooleanToEnable_SendDataInTextBox_Converter" />
             <local:BooleanToEnable_FixedData_Converter x:Key="BooleanToEnable_FixedData_Converter"/>
+            <local:BooleanToVisibility_Button_Converter x:Key="BooleanToVisibility_Button_Converter"/>
+            <local:BooleanToEnable_Button_Converter x:Key="BooleanToEnable_Button_Converter"/>
         </ResourceDictionary>
     </Window.Resources>
     <Window.DataContext>
         <local:MainContext/>
     </Window.DataContext>
     <!--<Window.InputBindings>
-        <KeyBinding Key="Enter" Command="{Binding EnterMainWindowCommand}"/>
+        <KeyBinding Key="Space" Command="{Binding SpaceMainWindowCommand}"/>
     </Window.InputBindings>-->
-    <Border BorderBrush="Gray" BorderThickness="1">
+    <Border BorderBrush="Gray" BorderThickness="1" PreviewKeyDown="OnPreviewKeyDown">
         <Grid Background="#ECF2F2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40" />
@@ -67,8 +69,11 @@
                             Padding="0,0,0,0" Height="40" FontSize="20" 
                             VerticalAlignment="Center" x:Name="tbxBarcode">
                         <!--<TextBox.InputBindings>
-                                <KeyBinding Key="Enter" Command="{Binding EnterTextBoxCommand}"/>
-                            </TextBox.InputBindings>-->
+                            <KeyBinding Key="Enter" Command="{Binding EnterTextBoxCommand}"/>
+                        </TextBox.InputBindings>-->
+                        <!--<TextBox.InputBindings>
+                            <KeyBinding Key="Space" Command="{Binding SpaceTextBoxCommand}"/>
+                        </TextBox.InputBindings>-->
                     </TextBox>
                 </Grid>
             </Grid>
@@ -97,6 +102,7 @@
                 </Grid>
                 <Grid Grid.Column="1">
                     <Button Height="30" Width="120" Margin="0,0,30,0" Content="RESET"
+                        Visibility="{Binding Config.IsUseResetButton, Converter={StaticResource BooleanToVisibility_Button_Converter}}"
                         VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding ResetCommand}"/>
                 </Grid>
 

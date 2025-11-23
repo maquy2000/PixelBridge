@@ -1,0 +1,11 @@
+{
+  "IP": "127.0.0.1",
+  "Port": 6677,
+  "SendDataMode": 0,
+  "FixedString": "CHECK",
+  "ResetString": "RESET",
+  "IsCompareLengthOfInputData": false,
+  "LengthOfInputCompare": 13,
+  "IsInputDataContain": false,
+  "InputDataContainString": "A2"
+}

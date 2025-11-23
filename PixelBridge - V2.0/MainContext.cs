@@ -89,8 +89,10 @@ namespace PixelBridge
                 }
             }
         }
-        public RelayCommand EnterTextBoxCommand { get; set; }
-        public RelayCommand EnterMainWindowCommand { get; set; }
+        //public RelayCommand EnterTextBoxCommand { get; set; }
+        //public RelayCommand EnterMainWindowCommand { get; set; }
+        //public RelayCommand SpaceTextBoxCommand { get; set; }
+        public RelayCommand SpaceMainWindowCommand { get; set; }
         public RelayCommand GlobalEnterCommand { get; set; }
 
         public MainContext()
@@ -100,6 +102,8 @@ namespace PixelBridge
             ResetCommand = new RelayCommand(OnResetCommand);
             //EnterTextBoxCommand = new RelayCommand(OnEnterTextBoxCommand);
             //EnterMainWindowCommand = new RelayCommand(OnEnterMainWindowCommand);
+            //SpaceTextBoxCommand = new RelayCommand(OnSpaceTextBoxCommand);
+            SpaceMainWindowCommand = new RelayCommand(OnSpaceMainWindowCommand);
             GlobalEnterCommand = new RelayCommand(OnGlobalEnterCommand);
 
             LoadConfiguration();
@@ -118,13 +122,33 @@ namespace PixelBridge
             };
             tcp.StartMonitorConnection();
         }
-        private void OnEnterTextBoxCommand(object obj)
+        //private void OnEnterTextBoxCommand(object obj)
+        //{
+        //    //MessageBox.Show("ENTER trong TextBox");
+        //}
+        //private void OnEnterMainWindowCommand(object obj)
+        //{
+        //    //MessageBox.Show("ENTER trong app (Window focus)");
+        //}
+        //private void OnSpaceTextBoxCommand(object obj)
+        //{
+        //    MessageBox.Show("SPACE trong TextBox");
+        //    if (!string.IsNullOrEmpty(Config.SpaceString) && Config.IsUseSpaceButton == true)
+        //    {
+        //        bool isSendOK =  tcp.SendData(Config.SpaceString);
+        //        DataToSendInTextBox = "";
+        //        if (isSendOK) StringError = "";
+        //    }
+        //}
+        private void OnSpaceMainWindowCommand(object obj)
         {
-            //MessageBox.Show("ENTER trong TextBox");
-        }
-        private void OnEnterMainWindowCommand(object obj)
-        {
-            //MessageBox.Show("ENTER trong app (Window focus)");
+            //MessageBox.Show("SPACE trong app (Window focus)");
+            if (!string.IsNullOrEmpty(Config.SpaceString) && Config.IsUseSpaceButton == true)
+            {
+                bool isSendOK = tcp.SendData(Config.SpaceString);
+                DataToSendInTextBox = "";
+                if (isSendOK) StringError = "";
+            }
         }
         private void OnGlobalEnterCommand(object obj)
         {
@@ -206,15 +230,20 @@ namespace PixelBridge
             tcp.StartMonitorConnection();
         }
         /// <summary>
-        /// 
+        /// Bấm vào nút RESET
         /// </summary>
         /// <param name="o"></param>
         public void OnResetCommand(object o)
         {
-            tcp.SendData("RESET");
+            if (!string.IsNullOrEmpty(Config.ResetString) && Config.IsUseResetButton == true)
+            {
+                bool isSendOK = tcp.SendData(Config.ResetString);
+                DataToSendInTextBox = "";
+                if (isSendOK) StringError = "";
+            }
         }
         /// <summary>
-        /// 
+        /// Load file config
         /// </summary>
         private void LoadConfiguration()
         {

@@ -51,4 +51,46 @@ namespace PixelBridge
             return true;
         }
     }
+
+    internal class BooleanToEnable_Button_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if(value is bool v)
+            {
+                return v;
+            }
+            return false;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool v)
+            {
+                return !v;
+            }
+            return false;
+        }
+    }
+
+    internal class BooleanToVisibility_Button_Converter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool v)
+            {
+                if( v == true) return Visibility.Visible;
+                else return Visibility.Hidden;
+            }
+            return Visibility.Hidden;
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (value is bool v)
+            {
+                if (v == true) return Visibility.Hidden;
+                else return Visibility.Visible;
+            }
+            return Visibility.Hidden;
+        }
+    }
 }

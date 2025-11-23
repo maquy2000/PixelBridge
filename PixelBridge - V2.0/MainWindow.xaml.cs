@@ -136,7 +136,7 @@ namespace PixelBridge
 
         #endregion
 
-        #region Kiểm soát nút enter đầu vào
+        #region Kiểm soát nút enter đầu vào - space toàn cục
         // --- Import WinAPI ---
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
@@ -256,6 +256,17 @@ namespace PixelBridge
                     catch { }
                 }));
             }
+        }
+        private void OnPreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+            {
+                var vm = DataContext as MainContext;
+                vm?.SpaceMainWindowCommand?.Execute(null);
+                e.Handled = true;
+            }
+
+            base.OnPreviewKeyDown(e);
         }
     }
 }
