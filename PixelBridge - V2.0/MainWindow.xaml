@@ -40,9 +40,13 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
                     <Image Source="Resource/PixelBridge.ico"/>
                     <TextBlock 
-                            Text="Pixel Bridge - V2.0" 
+                            Text="Pixel Bridge - V" 
                             Margin="5,0,0,0" VerticalAlignment="Center" 
                             FontSize="18" FontWeight="Bold" Foreground="#0099CC" />
+                    <TextBlock 
+                        Text="{Binding version}" 
+                        Margin="0,0,0,0" VerticalAlignment="Center" 
+                        FontSize="18" FontWeight="Bold" Foreground="#0099CC" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Height="40"

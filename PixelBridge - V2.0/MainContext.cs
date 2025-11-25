@@ -13,10 +13,43 @@ using System.Windows.Media;
 
 namespace PixelBridge
 {
+    [TypeConverter(typeof(EnumDescriptionConverter))]
     public enum SendDataMode
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("String in Textbox")]
         StringInTextBox,
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("Fixed string")]
         FixedString
+    }
+    [TypeConverter(typeof(EnumDescriptionConverter))]
+    public enum EndStringMode
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("None")]
+        None,
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("<CR>")]
+        CR,
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("<LF>")]
+        LF,
+        /// <summary>
+        /// 
+        /// </summary>
+        [Description("<CR><LF>")]
+        CRLF
     }
     /// <summary>
     /// 
@@ -39,6 +72,7 @@ namespace PixelBridge
         private bool _isConnected = false;
         private string configPath = "data.json";
         private System.Timers.Timer? _checkTimer;
+        public string version { get; set; } = "2.0.2";
         public RelayCommand ExitCommand { get; set; }
         public RelayCommand SettingCommand { get; set; }
         public RelayCommand ResetCommand { get; set; }
@@ -109,18 +143,41 @@ namespace PixelBridge
             LoadConfiguration();
             StringError = $"Chờ kết nối đến server {Config.IP} : {Config.Port}";
 
+            InitializeTCPClient();
+        }
+        /// <summary>
+        /// Khởi động tcp chính
+        /// </summary>
+        private void InitializeTCPClient()
+        {
             tcp = new TCPClient(Config.IP, Config.Port);
+            tcp.EndStringSending = ConvertEndString(Config.EndStringMode);
             tcp.ConnectionStateChanged += (connected) =>
             {
                 // Nếu không thay đổi thì KHÔNG update UI
                 if (IsConnected == connected) return;
-
                 App.Current.Dispatcher.BeginInvoke(() =>
                 {
                     IsConnected = connected;
                 });
             };
             tcp.StartMonitorConnection();
+        }
+        /// <summary>
+        /// Chuyển đổi End String
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        private string ConvertEndString(EndStringMode mode)
+        {
+            return mode switch
+            {
+                EndStringMode.None => "",
+                EndStringMode.CR => "\r",
+                EndStringMode.LF => "\n",
+                EndStringMode.CRLF => "\r\n",
+                _ => "",
+            };
         }
         //private void OnEnterTextBoxCommand(object obj)
         //{
@@ -216,18 +273,7 @@ namespace PixelBridge
             StringError = $"Chờ kết nối đến server {Config.IP} : {Config.Port}";
 
             // Kết nối lại IP:Port mới
-            tcp = new TCPClient(Config.IP, Config.Port);
-            tcp.ConnectionStateChanged += (connected) =>
-            {
-                // Nếu không thay đổi thì KHÔNG update UI
-                if (IsConnected == connected) return;
-
-                App.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    IsConnected = connected;
-                });
-            };
-            tcp.StartMonitorConnection();
+            InitializeTCPClient();
         }
         /// <summary>
         /// Bấm vào nút RESET

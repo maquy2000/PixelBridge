@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -91,6 +94,30 @@ namespace PixelBridge
                 else return Visibility.Visible;
             }
             return Visibility.Hidden;
+        }
+    }
+
+    public class EnumDescriptionConverter : EnumConverter
+    {
+        public EnumDescriptionConverter(Type type) : base(type) { }
+
+        public override object ConvertTo(ITypeDescriptorContext context,
+            CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType == typeof(string))
+            {
+                // Lấy DescriptionAttribute
+                FieldInfo fi = value.GetType().GetField(value.ToString());
+                DescriptionAttribute[] attributes =
+                    (DescriptionAttribute[])fi.GetCustomAttributes(typeof(DescriptionAttribute), false);
+
+                if (attributes.Length > 0)
+                    return attributes[0].Description;
+
+                return value.ToString();
+            }
+
+            return base.ConvertTo(context, culture, value, destinationType);
         }
     }
 }

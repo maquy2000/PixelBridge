@@ -21,6 +21,7 @@ namespace PixelBridge
         private bool _isReconnecting = false;
 
         public event Action<bool>? ConnectionStateChanged;
+        public string EndStringSending { get; set; } = string.Empty;
 
         public TCPClient(string ip, int port)
         {
@@ -182,7 +183,7 @@ namespace PixelBridge
                 try
                 {
                     Stream stream = tcpClient.GetStream();
-                    byte[] dataSend = Encoding.ASCII.GetBytes(msg);
+                    byte[] dataSend = Encoding.ASCII.GetBytes(msg + EndStringSending);
                     stream.Write(dataSend, 0, dataSend.Length);
                     return true;
                 }
@@ -224,6 +225,45 @@ namespace PixelBridge
                 if (n == 0) throw new IOException("Remote closed");
 
                 data = Encoding.ASCII.GetString(buf, 0, n);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        /// <summary>
+        /// Hàm đọc data từ TCP server đến khi gặp chuỗi kết thúc
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="endString"></param>
+        /// <param name="timeoutMs"></param>
+        /// <returns></returns>
+        public bool ReadData(out string data, string endString, int timeoutMs = 100)
+        {
+            data = string.Empty;
+            if (tcpClient == null) return false;
+            var stream = tcpClient.GetStream();
+            stream.ReadTimeout = timeoutMs;
+            var buf = new byte[BUFFER_SIZE];
+            StringBuilder sb = new StringBuilder();
+            try
+            {
+                if (!_lastState)
+                {
+                    tcpClient.Close();
+                    return false;
+                }
+                while (true)
+                {
+                    if (!stream.DataAvailable) break;
+                    int n = stream.Read(buf, 0, buf.Length);
+                    if (n == 0) throw new IOException("Remote closed");
+                    sb.Append(Encoding.ASCII.GetString(buf, 0, n));
+                    if (sb.ToString().Contains(endString))
+                        break;
+                }
+                data = sb.ToString();
                 return true;
             }
             catch

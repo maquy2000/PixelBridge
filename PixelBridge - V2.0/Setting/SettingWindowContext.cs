@@ -20,6 +20,7 @@ namespace PixelBridge
         public bool IsSaved { get; set; } = false;
         public RelayCommand SaveCommand { get; set; }
         public Array SendDataModeList => Enum.GetValues(typeof(SendDataMode));
+        public Array EndStringModeList => Enum.GetValues(typeof(EndStringMode));
         /// <summary>
         /// Config được load từ main context
         /// Hiển thị lên trên màn hình setting

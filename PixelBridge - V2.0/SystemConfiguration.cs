@@ -21,6 +21,10 @@ namespace PixelBridge
         /// </summary>
         public SendDataMode SendDataMode { get; set; } = SendDataMode.StringInTextBox;
         /// <summary>
+        /// Chuỗi kết thúc chuỗi gửi đi
+        /// </summary>
+        public EndStringMode EndStringMode { get; set; } = EndStringMode.None;
+        /// <summary>
         /// Chuỗi gửi đi nếu là cố định
         /// </summary>
         public string FixedString { get; set; } = "CHECK";
